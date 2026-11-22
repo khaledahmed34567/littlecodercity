@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "site": "khuwaylid-abc23",
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
