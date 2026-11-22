@@ -1,0 +1,41 @@
+name: Deploy Little Programmer City to Firebase Hosting
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: little-production
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093
+        with:
+          workload_identity_provider: projects/285848402380/locations/global/workloadIdentityPools/github-little/providers/github-main
+          token_format: access_token
+          project_id: khuwaylid-abc23
+          service_account: github-hosting-little@khuwaylid-abc23.iam.gserviceaccount.com
+      - name: Stage only site files
+        run: |
+          rm -rf public
+          mkdir public
+          for file in config.js index.html legal.html main.js parent.html play.html; do
+            test -f "$file" && test ! -L "$file"
+            cp "$file" "public/$file"
+          done
+          test "$(find public -type f | wc -l)" -eq 6
+          test "$(find public -type l | wc -l)" -eq 0
+      - name: Deploy Hosting only
+        run: npx --yes firebase-tools@15.37.0 deploy --only hosting --project khuwaylid-abc23 --non-interactive
