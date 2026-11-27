@@ -31,11 +31,11 @@ jobs:
         run: |
           rm -rf public
           mkdir public
-          for file in config.js index.html legal.html main.js parent.html play.html; do
+          for file in config.js index.html legal.html main.js parent.html play.html robots.txt sitemap.xml googlec2df2677c632442d.html; do
             test -f "$file" && test ! -L "$file"
             cp "$file" "public/$file"
           done
-          test "$(find public -type f | wc -l)" -eq 6
+          test "$(find public -type f | wc -l)" -eq 9
           test "$(find public -type l | wc -l)" -eq 0
       - name: Deploy Hosting only
         run: npx --yes firebase-tools@15.37.0 deploy --only hosting --project khuwaylid-abc23 --non-interactive
